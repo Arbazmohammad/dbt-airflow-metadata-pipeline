@@ -1,45 +1,71 @@
-Overview
-========
+# dbt-airflow-metadata-pipeline
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+## Overview
 
-Project Contents
-================
+This project implements a metadata pipeline for Airbnb booking data using the **medallion architecture** (Bronze, Silver, Gold layers). It extracts raw data from an AWS S3 bucket, loads it into Snowflake staging tables, transforms it using DBT, and orchestrates the workflow with Airflow.
 
-Your Astro project contains the following files and folders:
+## Architecture
+<img width="1680" height="820" alt="image" src="https://github.com/user-attachments/assets/a3cf4bc3-2110-400a-a908-08bbe1c7a2ac" />
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
 
-Deploy Your Project Locally
-===========================
+- **Bronze Layer:** Raw data ingested from S3 into Snowflake using the `COPY` command.
+- **Silver Layer:** Cleansed and enriched data models built with DBT.
+- **Gold Layer:** Business-ready tables, including a consolidated "One Big Table" (OBT) for analytics.
+- **Airflow DAG:** Automates the end-to-end pipeline, from extraction to transformation.
 
-Start Airflow on your local machine by running 'astro dev start'.
+## Tech Stack
+<img width="1493" height="527" alt="Screenshot 2026-02-05 at 9 23 58 PM" src="https://github.com/user-attachments/assets/76983537-dc63-488d-a401-b0fe5d1a8138" />
 
-This command will spin up five Docker containers on your machine, each for a different Airflow component:
 
-- Postgres: Airflow's Metadata Database
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- DAG Processor: The Airflow component responsible for parsing DAGs
-- API Server: The Airflow component responsible for serving the Airflow UI and API
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+## Pipeline Steps
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+1. **Extract:** Pull Airbnb booking data from AWS S3.
+2. **Load:** Stage data in Snowflake (Bronze).
+3. **Transform:** Use DBT to build Silver and Gold models.
+4. **Aggregate:** Create the OBT for unified analytics.
+5. **Orchestrate:** Manage the workflow with Airflow.
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+## Key Features
 
-Deploy Your Project to Astronomer
-=================================
+- Medallion architecture for scalable data modeling
+- Automated data extraction and loading
+- Modular DBT transformations
+- Airflow orchestration for reliability and scheduling
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+## Project Structure
 
-Contact
-=======
+```
+aws_dbt_snowflake_project/
+├── models/
+│   ├── bronze/
+│   ├── silver/
+│   ├── gold/
+│   │   └── obt.sql
+│   │   └── fact.sql        
+├── dags/
+│   └── dbt_dag.py
+├── dbt_project.yml
+└── README.md
+```
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+
+## Project Pipeline
+<img width="1908" height="925" alt="image" src="https://github.com/user-attachments/assets/74e2e2d5-0356-494e-ad94-1b1a4c7a05f0" />
+
+
+## Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Arbazmohammad/dbt-airflow-metadata-pipeline.git
+   ```
+2. Set up your AWS, Snowflake, and DBT credentials.
+3. Run the Airflow DAG to orchestrate the pipeline.
+4. Prerequisite: Docker, Astro CLI, Snowflake account
+
+
+
+##
+
+
+**Built by [Arbaz Mohammad](https://github.com/Arbazmohammad)**
