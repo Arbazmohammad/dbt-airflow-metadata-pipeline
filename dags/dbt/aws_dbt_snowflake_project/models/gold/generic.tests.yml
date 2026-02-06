@@ -1,0 +1,12 @@
+models:
+    - name: fact
+      columns:
+        - name: listing_id
+          tests:
+            - not_null
+        - name: host_id
+          tests:
+            - not_null
+        - name: booking_id
+          tests:
+            - not_null
